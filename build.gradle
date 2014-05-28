@@ -20,6 +20,7 @@ dependencies {
 
   compile gradleApi()
   compile localGroovy()
+  compile 'com.android.tools.build:gradle:0.9.+'
 }
 
 group = 'de.inovex.build.androidversion'

@@ -1,0 +1,77 @@
+/*buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.2'
+  }
+}*/
+
+apply plugin: 'groovy'
+apply plugin: 'maven'
+//apply plugin: 'nexus'
+apply plugin: 'idea'
+
+
+dependencies {
+  repositories {
+    mavenCentral()
+  }
+
+  compile gradleApi()
+  compile localGroovy()
+}
+
+group = 'de.inovex.build.androidversion'
+version = '0.0.2'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "file://$projectDir/../repo")
+        }
+    }
+
+}
+
+/*install {
+  repositories.mavenInstaller {
+    pom.artifactId = 'gradle-plugin'
+  }
+}
+uploadArchives {
+  repositories.mavenDeployer {
+    pom.artifactId = 'gradle-plugin'
+  }
+}
+
+modifyPom {
+  project {
+    name 'SDK Manager'
+    description 'Gradle plugin which downloads and manages your Android SDK.'
+    url 'https://github.com/JakeWharton/sdk-manager-plugin'
+    inceptionYear '2014'
+
+    scm {
+      url 'https://github.com/JakeWharton/sdk-manager-plugin'
+      connection 'scm:git:git://github.com/JakeWharton/sdk-manager-plugin.git'
+      developerConnection 'scm:git:ssh://git@github.com/JakeWharton/sdk-manager-plugin.git'
+    }
+
+    licenses {
+      license {
+        name 'The Apache Software License, Version 2.0'
+        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+        distribution 'repo'
+      }
+    }
+
+    developers {
+      developer {
+        id 'jakewharton'
+        name 'Jake Wharton'
+        email 'jakewharton@gmail.com'
+      }
+    }
+  }
+}*/

@@ -23,7 +23,7 @@ dependencies {
   compile 'com.android.tools.build:gradle:0.9.+'
 }
 
-group = 'de.inovex.build.androidversion'
+group = 'de.inovex.build.androidutils'
 version = '0.0.2'
 
 uploadArchives {

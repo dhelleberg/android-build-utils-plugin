@@ -11,6 +11,9 @@ import org.gradle.api.logging.Logging
  */
 class AndroidBuildUtilsPlugin implements Plugin<Project> {
 
+    static final String EXTENSION_NAME = 'androidBuildUtils'
+
+
     final Logger log = Logging.getLogger AndroidBuildUtilsPlugin
 
 
@@ -18,9 +21,6 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
     def buildTime = new Date().format("yyyy-MM-dd'|'HH:mm|Z", TimeZone.getTimeZone("UTC"))
     def hostName = "unknow" //will be set later
 
-    //config stuff TODO: get it via DSL
-    def setBuildConfigFields = true
-    def doVersioning = true
 
     //version TODO: Get this from git
     def version = "2.3.1"
@@ -28,14 +28,20 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        log.quiet("applying plugin $this")
+        log.quiet(">applying plugin $this")
+
+        project.extensions.create(EXTENSION_NAME, AndroidBuildUtilsPluginExtension)
 
         project.afterEvaluate {
             log.quiet("version $project.android.defaultConfig")
+            //get extension config from DSL
+            def extension = project.extensions.findByName(EXTENSION_NAME)
+            log.quiet("extension found: $extension")
+
             appName = project.name
-            if(setBuildConfigFields)
+            if(extension.buildConfigFields)
                 processBuildConfigFlags(project)
-            if(doVersioning)
+            if(extension.fileVersions)
                 processVersioning(project)
         }
     }

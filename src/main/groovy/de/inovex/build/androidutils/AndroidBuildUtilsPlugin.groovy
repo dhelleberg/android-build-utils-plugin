@@ -57,12 +57,25 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
             def apkSuffix = "-${variant.mergedFlavor.versionName}"
             def originalApkFile = variant.outputFile
             log.quiet("variant: $variant apkSuffix: $apkSuffix origName $originalApkFile")
-            log.quiet("!!! $project.archivesBaseName WHAT $variantData.variantConfiguration.baseName")
+            log.quiet("-> $project.archivesBaseName WHAT $variantData.variantConfiguration.baseName")
             log.quiet("is signed $variantData.signed()")
 
             def newApkFile = new File(originalApkFile.getParent(),  originalApkFile.name.replace(".apk", "${apkSuffix}.apk"))
             variant.outputFile = newApkFile
         }
+
+/*
+        project.android.libraryVariants.all { variant ->
+
+            log.quiet("!!! $project.archivesBaseName WHAT $variantData.variantConfiguration.baseName")
+        }
+*/
+
+        project.android.testVariants.all { variant ->
+
+            log.quiet("!!! $project.archivesBaseName WHAT $variantData.variantConfiguration.baseName")
+        }
+
     }
 
 

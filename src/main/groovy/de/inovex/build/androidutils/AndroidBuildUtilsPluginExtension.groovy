@@ -9,8 +9,12 @@ import groovy.transform.ToString
 class AndroidBuildUtilsPluginExtension {
 
     //config fields for the DSL
-    Boolean fileVersions = true
+    Boolean versioning = true
     Boolean buildConfigFields = true
+
+    Boolean setVersionCode = true
+    Boolean setVersionName = true
+    Boolean versionFileName = true
 
     String timeZone = "UTC"
 

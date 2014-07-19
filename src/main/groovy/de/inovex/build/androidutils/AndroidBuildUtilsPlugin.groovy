@@ -41,7 +41,7 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
             if(extension.buildConfigFields)
                 processBuildConfigFlags(project, extension)
 
-            if(extension.fileVersions)
+            if(extension.versioning)
                 processVersioning(project, extension)
         }
     }
@@ -49,25 +49,32 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
     def processVersioning(Project project, AndroidBuildUtilsPluginExtension extension) {
         //set version name and versioncode
 
-        AppVersionInformation appVersionInformation = readVersion(project)
+        AppVersionInformation appVersionInformation = new AppVersionInformation(extension.major, extension.minor, extension.patch)
 
         ProductFlavorDsl defConfig = project.android.defaultConfig
-        defConfig.versionCode = appVersionInformation.versionCode
-        defConfig.versionName = appVersionInformation.versionName
 
+        if(extension.setVersionCode)
+            defConfig.versionCode = appVersionInformation.versionCode
+        if(extension.setVersionName)
+            defConfig.versionName = appVersionInformation.versionName
 
         project.android.applicationVariants.all { variant ->
-            variant.mergedFlavor.versionName = appVersionInformation.versionName
-            variant.mergedFlavor.versionCode = appVersionInformation.versionCode
+            if(extension.setVersionName)
+                variant.mergedFlavor.versionName = appVersionInformation.versionName
+            if(extension.setVersionCode)
+                variant.mergedFlavor.versionCode = appVersionInformation.versionCode
 
-            def apkSuffix = "-${variant.mergedFlavor.versionName}"
-            def originalApkFile = variant.outputFile
-            log.quiet("variant: $variant apkSuffix: $apkSuffix origName $originalApkFile")
-            log.quiet("-> $project.archivesBaseName WHAT $variantData.variantConfiguration.baseName")
-            log.quiet("is signed $variantData.signed()")
+            if(extension.versionFileName) {
+                def apkSuffix = "-${variant.mergedFlavor.versionName}"
+                def originalApkFile = variant.outputFile
+                log.quiet("variant: $variant apkSuffix: $apkSuffix origName $originalApkFile")
+                log.quiet("-> $project.archivesBaseName WHAT $variantData.variantConfiguration.baseName")
+                log.quiet("is signed $variantData.signed()")
 
-            def newApkFile = new File(originalApkFile.getParent(),  originalApkFile.name.replace(".apk", "${apkSuffix}.apk"))
-            variant.outputFile = newApkFile
+                def newApkFile = new File(originalApkFile.getParent(),  originalApkFile.name.replace(".apk", "${apkSuffix}.apk"))
+                variant.outputFile = newApkFile
+            }
+
         }
 
 /*
@@ -100,17 +107,5 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
         defConfig.buildConfigField("String", "BUILD_HOST", "\"$hostName\"")
     }
 
-
-    AppVersionInformation readVersion(Project project) {
-
-        def rootProject = project.getRootProject()
-
-        log.quiet 'using version: '+rootProject.version
-
-        AppVersionInformation appVersionInformation = new AppVersionInformation(3,1,2)
-
-        log.quiet("appVersion: "+appVersionInformation)
-        return appVersionInformation
-    }
 
 }

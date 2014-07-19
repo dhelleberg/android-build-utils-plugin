@@ -18,7 +18,6 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
 
 
     //values for the build_config fields
-    def buildTime = new Date().format("yyyy-MM-dd'|'HH:mm|Z", TimeZone.getTimeZone("UTC"))
     def hostName = "unknow" //will be set later
 
 
@@ -40,13 +39,14 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
 
             appName = project.name
             if(extension.buildConfigFields)
-                processBuildConfigFlags(project)
+                processBuildConfigFlags(project, extension)
+
             if(extension.fileVersions)
-                processVersioning(project)
+                processVersioning(project, extension)
         }
     }
 
-    def processVersioning(Project project) {
+    def processVersioning(Project project, AndroidBuildUtilsPluginExtension extension) {
         //set version name and versioncode
 
         AppVersionInformation appVersionInformation = readVersion(project)
@@ -86,7 +86,7 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
 
 
 
-    def processBuildConfigFlags(Project project) {
+    def processBuildConfigFlags(Project project, AndroidBuildUtilsPluginExtension extension) {
         ProductFlavorDsl defConfig = project.android.defaultConfig
 
         try {
@@ -94,7 +94,7 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
         } catch(Exception e) {
             log.debug("could not determine hostname",e)
         }
-
+        def buildTime = new Date().format("yyyy-MM-dd'|'HH:mm|Z", TimeZone.getTimeZone(extension.timeZone))
 
         defConfig.buildConfigField("String", "BUILD_DATE", "\"$buildTime\"")
         defConfig.buildConfigField("String", "BUILD_HOST", "\"$hostName\"")
@@ -104,8 +104,6 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
     AppVersionInformation readVersion(Project project) {
 
         def rootProject = project.getRootProject()
-
-
 
         log.quiet 'using version: '+rootProject.version
 

@@ -30,12 +30,13 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
         log.quiet(">applying plugin $this")
 
         project.extensions.create(EXTENSION_NAME, AndroidBuildUtilsPluginExtension)
+        log.quiet("version $project.android.defaultConfig")
+        //get extension config from DSL
+        def extension = project.extensions.findByName(EXTENSION_NAME)
+
+        log.quiet(">! extension found: $extension")
 
         project.afterEvaluate {
-            log.quiet("version $project.android.defaultConfig")
-            //get extension config from DSL
-            def extension = project.extensions.findByName(EXTENSION_NAME)
-            log.quiet("extension found: $extension")
 
             appName = project.name
             if(extension.buildConfigFields)
@@ -67,11 +68,25 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
             if(extension.versionFileName) {
                 def apkSuffix = "-${variant.mergedFlavor.versionName}"
                 def originalApkFile = variant.outputFile
-                log.quiet("variant: $variant apkSuffix: $apkSuffix origName $originalApkFile")
+                log.quiet("variant: $variant.mergedFlavor apkSuffix: $apkSuffix origName $originalApkFile")
                 log.quiet("-> $project.archivesBaseName WHAT $variantData.variantConfiguration.baseName")
                 log.quiet("is signed $variantData.signed()")
 
-                def newApkFile = new File(originalApkFile.getParent(),  originalApkFile.name.replace(".apk", "${apkSuffix}.apk"))
+
+                def signed = variantData.signed ? "signed" : "unsigned"
+                def PATTERNS = extension.PATTERNS
+                String newAPKname = extension.apknamePattern;
+                //create new APK Filename
+                newAPKname = newAPKname.replaceAll(PATTERNS.APPLICATION_NAME, project.archivesBaseName);
+                newAPKname = newAPKname.replaceAll(PATTERNS.BUILDTYE, variantData.variantConfiguration.buildType.name);
+                newAPKname = newAPKname.replaceAll(PATTERNS.FLAVOR, variantData.variantConfiguration.flavorName);
+                newAPKname = newAPKname.replaceAll(PATTERNS.SIGNED , signed);
+
+
+                log.quiet("newAPKName: $newAPKname")
+
+//                def newApkFile = new File(originalApkFile.getParent(),  originalApkFile.name.replace(".apk", "${apkSuffix}.apk"))
+                def newApkFile = new File(originalApkFile.getParent(),  newAPKname)
                 variant.outputFile = newApkFile
             }
 
@@ -81,7 +96,7 @@ class AndroidBuildUtilsPlugin implements Plugin<Project> {
         project.android.libraryVariants.all { variant ->
 
             log.quiet("!!! $project.archivesBaseName WHAT $variantData.variantConfiguration.baseName")
-        }
+        }Í
 */
 
         project.android.testVariants.all { variant ->
